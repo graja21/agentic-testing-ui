@@ -1,0 +1,423 @@
+<div class="pipeline-page">
+  <section class="hero">
+    <div>
+      <span class="eyebrow">
+        Agentic Testing
+      </span>
+
+      <h1>Pipeline Runner</h1>
+
+      <p>
+        Generate, execute, evaluate and report chatbot
+        test cases from one interface.
+      </p>
+    </div>
+
+    <div class="hero-status">
+      <span class="status-dot"></span>
+      FastAPI connected
+    </div>
+  </section>
+
+  <section class="runner-card">
+    <form
+      [formGroup]="pipelineForm"
+      (ngSubmit)="runPipeline()"
+    >
+      <div class="form-group full-width">
+        <label for="specification">
+          Chatbot specification
+        </label>
+
+        <textarea
+          id="specification"
+          rows="5"
+          formControlName="specification"
+          placeholder="Describe the chatbot behavior..."
+        ></textarea>
+
+        @if (
+          pipelineForm.get('specification')?.touched &&
+          pipelineForm.get('specification')?.invalid
+        ) {
+          <small class="field-error">
+            The specification must contain at least
+            5 characters.
+          </small>
+        }
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="numberOfTests">
+            Number of tests
+          </label>
+
+          <input
+            id="numberOfTests"
+            type="number"
+            min="1"
+            max="20"
+            formControlName="number_of_tests"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="executionMode">
+            Execution mode
+          </label>
+
+          <select
+            id="executionMode"
+            formControlName="execution_mode"
+          >
+            <option value="web">
+              Web – Playwright
+            </option>
+
+            <option value="api">
+              API – HTTP
+            </option>
+
+            <option value="auto">
+              Auto
+            </option>
+          </select>
+        </div>
+      </div>
+
+      @if (
+        executionMode === 'api' ||
+        executionMode === 'auto'
+      ) {
+        <section class="configuration-section">
+          <h2>API configuration</h2>
+
+          <div class="form-group full-width">
+            <label for="endpointUrl">
+              API endpoint
+            </label>
+
+            <input
+              id="endpointUrl"
+              type="url"
+              formControlName="endpoint_url"
+            />
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="requestField">
+                Request field
+              </label>
+
+              <input
+                id="requestField"
+                type="text"
+                formControlName="request_field"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="responseField">
+                Response field
+              </label>
+
+              <input
+                id="responseField"
+                type="text"
+                formControlName="response_field"
+              />
+            </div>
+          </div>
+        </section>
+      }
+
+      @if (
+        executionMode === 'web' ||
+        executionMode === 'auto'
+      ) {
+        <section class="configuration-section">
+          <h2>Web configuration</h2>
+
+          <div class="form-group full-width">
+            <label for="pageUrl">
+              Chatbot page URL
+            </label>
+
+            <input
+              id="pageUrl"
+              type="url"
+              formControlName="page_url"
+            />
+          </div>
+
+          <div class="form-grid three-columns">
+            <div class="form-group">
+              <label for="inputSelector">
+                Input selector
+              </label>
+
+              <input
+                id="inputSelector"
+                type="text"
+                formControlName="input_selector"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="buttonSelector">
+                Button selector
+              </label>
+
+              <input
+                id="buttonSelector"
+                type="text"
+                formControlName="send_button_selector"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="responseSelector">
+                Response selector
+              </label>
+
+              <input
+                id="responseSelector"
+                type="text"
+                formControlName="response_selector"
+              />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="waitTime">
+                Wait time in milliseconds
+              </label>
+
+              <input
+                id="waitTime"
+                type="number"
+                formControlName="wait_after_send_ms"
+              />
+            </div>
+
+            <label class="checkbox-control">
+              <input
+                type="checkbox"
+                formControlName="headless"
+              />
+
+              <span>
+                Run browser in headless mode
+              </span>
+            </label>
+          </div>
+        </section>
+      }
+
+      <div class="form-actions">
+        <button
+          type="button"
+          class="secondary-button"
+          (click)="resetForm()"
+          [disabled]="loading"
+        >
+          Reset
+        </button>
+
+        <button
+          type="submit"
+          class="primary-button"
+          [disabled]="loading"
+        >
+          @if (loading) {
+            <span class="spinner"></span>
+            Running pipeline...
+          } @else {
+            Run pipeline
+          }
+        </button>
+      </div>
+    </form>
+  </section>
+
+  @if (errorMessage) {
+    <div class="error-alert">
+      <strong>Pipeline error</strong>
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
+
+  @if (result) {
+    <section class="results-section">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">
+            Execution completed
+          </span>
+
+          <h2>Pipeline results</h2>
+        </div>
+
+        <span class="mode-badge">
+          {{ result.execution_mode | uppercase }}
+        </span>
+      </div>
+
+      <div class="metrics-grid">
+        <article class="metric-card">
+          <span>Generated</span>
+          <strong>{{ result.generated_tests }}</strong>
+        </article>
+
+        <article class="metric-card">
+          <span>Executed</span>
+          <strong>{{ result.executed_tests }}</strong>
+        </article>
+
+        <article class="metric-card success">
+          <span>Passed</span>
+          <strong>{{ result.passed }}</strong>
+        </article>
+
+        <article class="metric-card danger">
+          <span>Failed</span>
+          <strong>{{ result.failed }}</strong>
+        </article>
+
+        <article class="metric-card warning">
+          <span>Errors</span>
+          <strong>{{ result.errors }}</strong>
+        </article>
+
+        <article class="metric-card accent">
+          <span>Pass rate</span>
+          <strong>{{ result.pass_rate }}%</strong>
+        </article>
+      </div>
+
+      <div class="test-results">
+        @for (
+          test of result.results;
+          track test.test_case_id
+        ) {
+          <article class="test-card">
+            <header class="test-header">
+              <div>
+                <span class="test-id">
+                  {{ test.test_case_id }}
+                </span>
+
+                <span class="execution-time">
+                  {{ test.execution_time_ms || 0 }}
+                  ms
+                </span>
+              </div>
+
+              <span
+                class="verdict"
+                [ngClass]="verdictClass(test.verdict)"
+              >
+                {{ test.verdict }}
+              </span>
+            </header>
+
+            <div class="score-row">
+              <span>Evaluation score</span>
+              <strong>{{ test.score }}/100</strong>
+            </div>
+
+            <div class="progress-track">
+              <div
+                class="progress-value"
+                [style.width.%]="test.score"
+              ></div>
+            </div>
+
+            <div class="result-block">
+              <h3>User input</h3>
+              <p>{{ test.user_input }}</p>
+            </div>
+
+            <div class="result-block">
+              <h3>Expected response</h3>
+              <p>{{ test.expected_response }}</p>
+            </div>
+
+            <div class="result-block">
+              <h3>Actual response</h3>
+              <p>
+                {{ test.actual_response || 'No response' }}
+              </p>
+            </div>
+
+            <div class="result-block">
+              <h3>Evaluator reason</h3>
+              <p>{{ test.reason }}</p>
+            </div>
+
+            @if (test.detected_failures.length > 0) {
+              <div class="failure-list">
+                <h3>Detected failures</h3>
+
+                <ul>
+                  @for (
+                    failure of test.detected_failures;
+                    track failure
+                  ) {
+                    <li>{{ failure }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (test.error) {
+              <div class="test-error">
+                {{ test.error }}
+              </div>
+            }
+
+            @if (test.screenshot_path) {
+              <p class="screenshot-path">
+                Screenshot:
+                <code>
+                  {{ test.screenshot_path }}
+                </code>
+              </p>
+            }
+          </article>
+        }
+      </div>
+
+      <section class="report-card">
+        <h2>Generated reports</h2>
+
+        <div class="report-grid">
+          <div>
+            <span>HTML report</span>
+            <strong>
+              {{ result.report.html_report_name || 'Unavailable' }}
+            </strong>
+
+            <code>
+              {{ result.report.html_report_path }}
+            </code>
+          </div>
+
+          <div>
+            <span>JSON report</span>
+            <strong>
+              {{ result.report.json_report_name || 'Unavailable' }}
+            </strong>
+
+            <code>
+              {{ result.report.json_report_path }}
+            </code>
+          </div>
+        </div>
+      </section>
+    </section>
+  }
+</div>
