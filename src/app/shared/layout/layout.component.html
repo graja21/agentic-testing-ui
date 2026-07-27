@@ -1,0 +1,52 @@
+<div class="app-shell">
+  <app-sidebar
+    [open]="sidebarOpen"
+    (closeSidebar)="closeSidebar()"
+  ></app-sidebar>
+
+  <div
+    class="mobile-overlay"
+    [class.visible]="sidebarOpen"
+    (click)="closeSidebar()"
+  ></div>
+
+  <main class="main-area">
+    <header class="topbar">
+      <button
+        type="button"
+        class="menu-button"
+        aria-label="Open navigation"
+        (click)="toggleSidebar()"
+      >
+        <i class="bi bi-list"></i>
+      </button>
+
+      <div>
+        <span class="topbar-label">
+          Agentic Testing
+        </span>
+
+        <h1>AI Quality Platform</h1>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="connection-status">
+          <span class="status-dot"></span>
+          Backend connected
+        </div>
+
+        <button
+          type="button"
+          class="profile-button"
+          aria-label="User profile"
+        >
+          <i class="bi bi-person"></i>
+        </button>
+      </div>
+    </header>
+
+    <section class="page-content">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>

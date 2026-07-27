@@ -1,0 +1,142 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.main-area {
+  width: calc(100% - 270px);
+  min-height: 100vh;
+  margin-left: 270px;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80px;
+  border-bottom: 1px solid #e5e9f2;
+  padding: 14px 30px;
+  background: rgb(255 255 255 / 92%);
+  backdrop-filter: blur(14px);
+}
+
+.topbar-label {
+  display: block;
+  margin-bottom: 2px;
+  color: #685cff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.topbar h1 {
+  margin: 0;
+  color: #172033;
+  font-size: 20px;
+  font-weight: 750;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #19734b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #25a86b;
+  box-shadow: 0 0 0 4px rgb(37 168 107 / 12%);
+}
+
+.profile-button,
+.menu-button {
+  display: grid;
+  place-items: center;
+  border: 1px solid #dfe4ed;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #30394d;
+  cursor: pointer;
+}
+
+.profile-button {
+  width: 42px;
+  height: 42px;
+  font-size: 18px;
+}
+
+.menu-button {
+  display: none;
+  width: 42px;
+  height: 42px;
+  font-size: 22px;
+}
+
+.page-content {
+  padding: 28px;
+}
+
+.mobile-overlay {
+  display: none;
+}
+
+@media (max-width: 950px) {
+  .main-area {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .menu-button {
+    display: grid;
+  }
+
+  .topbar {
+    gap: 14px;
+    padding: 14px 18px;
+  }
+
+  .connection-status {
+    display: none;
+  }
+
+  .page-content {
+    padding: 18px;
+  }
+
+  .mobile-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    display: block;
+    pointer-events: none;
+    background: rgb(13 20 36 / 45%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .mobile-overlay.visible {
+    pointer-events: auto;
+    opacity: 1;
+  }
+}

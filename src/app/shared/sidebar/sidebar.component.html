@@ -1,1 +1,91 @@
-<p>sidebar works!</p>
+<aside
+  class="sidebar"
+  [class.open]="open"
+>
+  <div class="brand">
+    <div class="brand-icon">
+      <i class="bi bi-cpu"></i>
+    </div>
+
+    <div>
+      <strong>Agentic Testing</strong>
+      <span>AI Quality Platform</span>
+    </div>
+
+    <button
+      type="button"
+      class="close-button"
+      aria-label="Close navigation"
+      (click)="close()"
+    >
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="workspace-label">
+    Workspace
+  </div>
+
+  <nav class="navigation">
+    @for (
+      item of navigationItems;
+      track item.route
+    ) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        (click)="close()"
+      >
+        <i
+          class="bi"
+          [ngClass]="item.icon"
+        ></i>
+
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="services-card">
+      <h3>System status</h3>
+
+      <div class="service">
+        <span>
+          <i class="bi bi-server"></i>
+          FastAPI
+        </span>
+
+        <span class="online">
+          Online
+        </span>
+      </div>
+
+      <div class="service">
+        <span>
+          <i class="bi bi-robot"></i>
+          Ollama
+        </span>
+
+        <span class="online">
+          Ready
+        </span>
+      </div>
+
+      <div class="service">
+        <span>
+          <i class="bi bi-browser-chrome"></i>
+          Playwright
+        </span>
+
+        <span class="online">
+          Ready
+        </span>
+      </div>
+    </div>
+
+    <div class="version">
+      Agentic Testing v1.0
+    </div>
+  </div>
+</aside>

@@ -1,1 +1,127 @@
-<p>dashboard works!</p>
+<section class="dashboard">
+  <header class="page-heading">
+    <div>
+      <span class="eyebrow">
+        Overview
+      </span>
+
+      <h2>Testing dashboard</h2>
+
+      <p>
+        Monitor your agentic chatbot testing platform.
+      </p>
+    </div>
+
+    <a
+      routerLink="/pipeline"
+      class="run-button"
+    >
+      <i class="bi bi-play-fill"></i>
+      Run pipeline
+    </a>
+  </header>
+
+  <div class="metrics">
+    <article>
+      <div class="metric-icon purple">
+        <i class="bi bi-diagram-3"></i>
+      </div>
+
+      <span>Total executions</span>
+      <strong>0</strong>
+      <small>Waiting for your first run</small>
+    </article>
+
+    <article>
+      <div class="metric-icon green">
+        <i class="bi bi-check-circle"></i>
+      </div>
+
+      <span>Passed tests</span>
+      <strong>0</strong>
+      <small>No results available</small>
+    </article>
+
+    <article>
+      <div class="metric-icon red">
+        <i class="bi bi-x-circle"></i>
+      </div>
+
+      <span>Failed tests</span>
+      <strong>0</strong>
+      <small>No results available</small>
+    </article>
+
+    <article>
+      <div class="metric-icon orange">
+        <i class="bi bi-speedometer2"></i>
+      </div>
+
+      <span>Pass rate</span>
+      <strong>0%</strong>
+      <small>Run a pipeline to calculate</small>
+    </article>
+  </div>
+
+  <div class="dashboard-grid">
+    <article class="panel agents-panel">
+      <header>
+        <div>
+          <span class="eyebrow">Architecture</span>
+          <h3>Agent pipeline</h3>
+        </div>
+
+        <span class="ready-badge">
+          Ready
+        </span>
+      </header>
+
+      <div class="agent-flow">
+        <div class="agent">
+          <i class="bi bi-stars"></i>
+          <strong>Generator</strong>
+          <span>Creates test cases</span>
+        </div>
+
+        <i class="bi bi-arrow-right flow-arrow"></i>
+
+        <div class="agent">
+          <i class="bi bi-play-circle"></i>
+          <strong>Executor</strong>
+          <span>Runs API or Web tests</span>
+        </div>
+
+        <i class="bi bi-arrow-right flow-arrow"></i>
+
+        <div class="agent">
+          <i class="bi bi-search"></i>
+          <strong>Evaluator</strong>
+          <span>Scores responses</span>
+        </div>
+
+        <i class="bi bi-arrow-right flow-arrow"></i>
+
+        <div class="agent">
+          <i class="bi bi-file-earmark-text"></i>
+          <strong>Reporter</strong>
+          <span>Builds reports</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel quick-panel">
+      <span class="eyebrow">Quick start</span>
+      <h3>Launch a new test</h3>
+
+      <p>
+        Describe your chatbot, select API or Web mode,
+        then execute the complete agentic pipeline.
+      </p>
+
+      <a routerLink="/pipeline">
+        Configure pipeline
+        <i class="bi bi-arrow-right"></i>
+      </a>
+    </article>
+  </div>
+</section>
