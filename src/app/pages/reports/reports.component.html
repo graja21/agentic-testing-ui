@@ -1,15 +1,305 @@
-<p>reports works!</p>
 <section class="reports-page">
-  <span class="eyebrow">Reports</span>
-  <h2>Generated reports</h2>
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">
+        MONGODB HISTORY
+      </p>
 
-  <div class="empty-state">
-    <i class="bi bi-file-earmark-bar-graph"></i>
+      <h1>
+        Execution Reports
+      </h1>
 
-    <h3>No reports yet</h3>
+      <p class="subtitle">
+        Review and manage saved pipeline executions.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="loading"
+        (click)="loadExecutions()"
+      >
+        <i
+          class="bi bi-arrow-clockwise"
+          [class.spin]="loading"
+        ></i>
+
+        Refresh
+      </button>
+
+      <button
+        type="button"
+        class="danger-button"
+        [disabled]="
+          loading
+          || executions.length === 0
+        "
+        (click)="clearHistory()"
+      >
+        <i class="bi bi-trash"></i>
+
+        Clear history
+      </button>
+
+      <a
+        routerLink="/pipeline-runner"
+        class="primary-button"
+      >
+        <i class="bi bi-play-fill"></i>
+
+        Run Pipeline
+      </a>
+    </div>
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="alert error"
+  >
+    <i class="bi bi-exclamation-triangle"></i>
+
+    {{ errorMessage }}
+  </div>
+
+  <div
+    *ngIf="successMessage"
+    class="alert success"
+  >
+    <i class="bi bi-check-circle"></i>
+
+    {{ successMessage }}
+  </div>
+
+  <div
+    *ngIf="loading"
+    class="loading-state"
+  >
+    <div class="spinner"></div>
+
+    <span>
+      Loading execution history...
+    </span>
+  </div>
+
+  <div
+    *ngIf="
+      !loading
+      && executions.length === 0
+    "
+    class="empty-state"
+  >
+    <i class="bi bi-database"></i>
+
+    <h2>
+      No saved executions
+    </h2>
 
     <p>
-      Run a pipeline to generate HTML and JSON reports.
+      Run a pipeline to create your first
+      MongoDB execution record.
     </p>
+
+    <a
+      routerLink="/pipeline-runner"
+      class="primary-button"
+    >
+      Run Pipeline
+    </a>
+  </div>
+
+  <div
+    *ngIf="
+      !loading
+      && executions.length > 0
+    "
+    class="table-card"
+  >
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Mode</th>
+            <th>Specification</th>
+            <th>Tests</th>
+            <th>Passed</th>
+            <th>Failed</th>
+            <th>Errors</th>
+            <th>Pass rate</th>
+            <th>Status</th>
+            <th class="actions-column">
+              Actions
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            *ngFor="
+              let execution of executions;
+              trackBy: trackExecution
+            "
+          >
+            <td>
+              {{
+                execution.created_at
+                  | date: 'dd/MM/yyyy HH:mm'
+              }}
+            </td>
+
+            <td>
+              <span
+                class="mode-badge"
+                [class.web]="
+                  execution.execution_mode
+                    === 'web'
+                "
+                [class.api]="
+                  execution.execution_mode
+                    === 'api'
+                "
+              >
+                <i
+                  class="bi"
+                  [ngClass]="
+                    execution.execution_mode
+                      === 'web'
+                      ? 'bi-globe'
+                      : 'bi-code-slash'
+                  "
+                ></i>
+
+                {{
+                  execution.execution_mode
+                    | uppercase
+                }}
+              </span>
+            </td>
+
+            <td class="specification-cell">
+              <span
+                [title]="execution.specification"
+              >
+                {{
+                  execution.specification
+                    | slice: 0: 65
+                }}
+
+                <span
+                  *ngIf="
+                    execution.specification.length
+                      > 65
+                  "
+                >
+                  ...
+                </span>
+              </span>
+            </td>
+
+            <td>
+              {{ execution.executed_tests }}
+            </td>
+
+            <td class="passed-value">
+              {{ execution.passed }}
+            </td>
+
+            <td class="failed-value">
+              {{ execution.failed }}
+            </td>
+
+            <td class="error-value">
+              {{ execution.errors }}
+            </td>
+
+            <td>
+              <strong>
+                {{
+                  execution.pass_rate
+                    | number: '1.0-2'
+                }}%
+              </strong>
+            </td>
+
+            <td>
+              <span
+                class="status-badge"
+                [ngClass]="
+                  getStatusClass(execution)
+                "
+              >
+                <ng-container
+                  *ngIf="execution.errors > 0"
+                >
+                  Error
+                </ng-container>
+
+                <ng-container
+                  *ngIf="
+                    execution.errors === 0
+                    && execution.pass_rate >= 80
+                  "
+                >
+                  Passed
+                </ng-container>
+
+                <ng-container
+                  *ngIf="
+                    execution.errors === 0
+                    && execution.pass_rate >= 50
+                    && execution.pass_rate < 80
+                  "
+                >
+                  Partial
+                </ng-container>
+
+                <ng-container
+                  *ngIf="
+                    execution.errors === 0
+                    && execution.pass_rate < 50
+                  "
+                >
+                  Failed
+                </ng-container>
+              </span>
+            </td>
+
+            <td class="actions-cell">
+              <a
+                class="icon-button view"
+                [routerLink]="[
+                  '/reports',
+                  execution.id
+                ]"
+                title="View execution details"
+              >
+                <i class="bi bi-eye"></i>
+              </a>
+
+              <button
+                type="button"
+                class="icon-button delete"
+                [disabled]="
+                  deletingId === execution.id
+                "
+                (click)="deleteExecution(execution)"
+                title="Delete execution"
+              >
+                <i
+                  class="bi"
+                  [ngClass]="
+                    deletingId === execution.id
+                      ? 'bi-hourglass-split'
+                      : 'bi-trash'
+                  "
+                ></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </section>

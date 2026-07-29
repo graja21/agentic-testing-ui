@@ -1,0 +1,514 @@
+<section class="details-page">
+  <div class="page-header">
+    <div>
+      <a
+        routerLink="/reports"
+        class="back-link"
+      >
+        <i class="bi bi-arrow-left"></i>
+
+        Back to reports
+      </a>
+
+      <p class="eyebrow">
+        EXECUTION DETAILS
+      </p>
+
+      <h1>
+        Pipeline Execution
+      </h1>
+
+      <p
+        *ngIf="execution"
+        class="execution-id"
+      >
+        ID: {{ execution.id }}
+      </p>
+    </div>
+
+    <div
+      *ngIf="execution"
+      class="header-actions"
+    >
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="loading"
+        (click)="loadExecution()"
+      >
+        <i
+          class="bi bi-arrow-clockwise"
+          [class.spin]="loading"
+        ></i>
+
+        Refresh
+      </button>
+
+      <button
+        type="button"
+        class="danger-button"
+        [disabled]="deleting"
+        (click)="deleteExecution()"
+      >
+        <i
+          class="bi"
+          [ngClass]="
+            deleting
+              ? 'bi-hourglass-split'
+              : 'bi-trash'
+          "
+        ></i>
+
+        Delete
+      </button>
+    </div>
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="alert error"
+  >
+    <i class="bi bi-exclamation-triangle"></i>
+
+    {{ errorMessage }}
+  </div>
+
+  <div
+    *ngIf="loading"
+    class="loading-state"
+  >
+    <div class="spinner"></div>
+
+    <span>
+      Loading execution details...
+    </span>
+  </div>
+
+  <ng-container
+    *ngIf="!loading && execution"
+  >
+    <div class="overview-grid">
+      <article class="overview-card">
+        <span class="overview-label">
+          Date
+        </span>
+
+        <strong>
+          {{
+            execution.created_at
+              | date: 'dd/MM/yyyy HH:mm'
+          }}
+        </strong>
+      </article>
+
+      <article class="overview-card">
+        <span class="overview-label">
+          Mode
+        </span>
+
+        <span
+          class="mode-badge"
+          [class.web]="
+            execution.execution_mode
+              === 'web'
+          "
+          [class.api]="
+            execution.execution_mode
+              === 'api'
+          "
+        >
+          <i
+            class="bi"
+            [ngClass]="
+              execution.execution_mode
+                === 'web'
+                ? 'bi-globe'
+                : 'bi-code-slash'
+            "
+          ></i>
+
+          {{
+            execution.execution_mode
+              | uppercase
+          }}
+        </span>
+      </article>
+
+      <article class="overview-card">
+        <span class="overview-label">
+          Status
+        </span>
+
+        <span
+          class="status-badge"
+          [ngClass]="
+            getExecutionStatusClass()
+          "
+        >
+          {{ getExecutionStatusLabel() }}
+        </span>
+      </article>
+
+      <article class="overview-card">
+        <span class="overview-label">
+          Pass Rate
+        </span>
+
+        <strong class="pass-rate-value">
+          {{
+            execution.pass_rate
+              | number: '1.0-2'
+          }}%
+        </strong>
+      </article>
+    </div>
+
+    <article class="content-card">
+      <div class="card-header">
+        <div>
+          <span class="card-kicker">
+            SPECIFICATION
+          </span>
+
+          <h2>
+            Chatbot description
+          </h2>
+        </div>
+      </div>
+
+      <p class="specification-text">
+        {{ execution.specification }}
+      </p>
+    </article>
+
+    <div class="stats-grid">
+      <article class="stat-card">
+        <span class="stat-label">
+          Requested
+        </span>
+
+        <strong>
+          {{ execution.requested_tests }}
+        </strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-label">
+          Generated
+        </span>
+
+        <strong>
+          {{ execution.generated_tests }}
+        </strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-label">
+          Executed
+        </span>
+
+        <strong>
+          {{ execution.executed_tests }}
+        </strong>
+      </article>
+
+      <article class="stat-card success">
+        <span class="stat-label">
+          Passed
+        </span>
+
+        <strong>
+          {{ execution.passed }}
+        </strong>
+      </article>
+
+      <article class="stat-card danger">
+        <span class="stat-label">
+          Failed
+        </span>
+
+        <strong>
+          {{ execution.failed }}
+        </strong>
+      </article>
+
+      <article class="stat-card warning">
+        <span class="stat-label">
+          Errors
+        </span>
+
+        <strong>
+          {{ execution.errors }}
+        </strong>
+      </article>
+    </div>
+
+    <article class="content-card">
+      <div class="card-header">
+        <div>
+          <span class="card-kicker">
+            TEST RESULTS
+          </span>
+
+          <h2>
+            Test cases
+          </h2>
+        </div>
+
+        <span class="result-count">
+          {{ execution.results.length }}
+          result(s)
+        </span>
+      </div>
+
+      <div class="test-list">
+        <article
+          *ngFor="
+            let result of execution.results;
+            let index = index;
+            trackBy: trackResult
+          "
+          class="test-card"
+        >
+          <div class="test-card-header">
+            <div>
+              <span class="test-number">
+                TEST {{ index + 1 }}
+              </span>
+
+              <h3>
+                {{ result.test_case_id }}
+              </h3>
+            </div>
+
+            <div class="test-status-group">
+              <span
+                class="verdict-badge"
+                [ngClass]="
+                  getVerdictClass(result)
+                "
+              >
+                {{ result.verdict }}
+              </span>
+
+              <span class="score-badge">
+                {{ result.score }}%
+              </span>
+            </div>
+          </div>
+
+          <div class="response-grid">
+            <section class="response-block">
+              <span class="response-label">
+                User Input
+              </span>
+
+              <p>
+                {{ result.user_input }}
+              </p>
+            </section>
+
+            <section class="response-block">
+              <span class="response-label">
+                Expected Response
+              </span>
+
+              <p>
+                {{ result.expected_response }}
+              </p>
+            </section>
+
+            <section class="response-block actual">
+              <span class="response-label">
+                Actual Response
+              </span>
+
+              <p>
+                {{
+                  result.actual_response
+                    || 'No response returned.'
+                }}
+              </p>
+            </section>
+
+            <section class="response-block">
+              <span class="response-label">
+                Evaluation Reason
+              </span>
+
+              <p>
+                {{ result.reason }}
+              </p>
+            </section>
+          </div>
+
+          <div
+            *ngIf="
+              result.detected_failures.length > 0
+            "
+            class="failure-section"
+          >
+            <span class="response-label">
+              Detected Failures
+            </span>
+
+            <ul>
+              <li
+                *ngFor="
+                  let failure of
+                    result.detected_failures
+                "
+              >
+                {{ failure }}
+              </li>
+            </ul>
+          </div>
+
+          <div class="test-meta">
+            <span>
+              <i class="bi bi-activity"></i>
+
+              Status:
+              {{ result.execution_status }}
+            </span>
+
+            <span>
+              <i class="bi bi-clock"></i>
+
+              {{
+                result.execution_time_ms
+                  | number: '1.0-2'
+              }}
+              ms
+            </span>
+
+            <span
+              *ngIf="result.error"
+              class="error-meta"
+            >
+              <i
+                class="bi bi-exclamation-triangle"
+              ></i>
+
+              {{ result.error }}
+            </span>
+          </div>
+
+          <div
+            *ngIf="
+              getScreenshotUrl(
+                result.screenshot_path
+              ) as screenshotUrl
+            "
+            class="screenshot-section"
+          >
+            <span class="response-label">
+              Screenshot
+            </span>
+
+            <a
+              [href]="screenshotUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="screenshot-link"
+            >
+              <img
+                [src]="screenshotUrl"
+                [alt]="
+                  'Screenshot for '
+                  + result.test_case_id
+                "
+              />
+            </a>
+          </div>
+        </article>
+      </div>
+    </article>
+
+    <article class="content-card">
+      <div class="card-header">
+        <div>
+          <span class="card-kicker">
+            GENERATED REPORTS
+          </span>
+
+          <h2>
+            Report files
+          </h2>
+        </div>
+      </div>
+
+      <div class="report-grid">
+        <article class="report-card">
+          <div class="report-icon html">
+            <i
+              class="bi bi-filetype-html"
+            ></i>
+          </div>
+
+          <div class="report-content">
+            <strong>
+              HTML Report
+            </strong>
+
+            <span>
+              {{
+                execution.report
+                  .html_report_name
+                  || 'Not generated'
+              }}
+            </span>
+          </div>
+
+          <a
+            *ngIf="
+              getHtmlReportUrl()
+                as htmlUrl
+            "
+            [href]="htmlUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="report-button"
+          >
+            Open
+          </a>
+        </article>
+
+        <article class="report-card">
+          <div class="report-icon json">
+            <i
+              class="bi bi-filetype-json"
+            ></i>
+          </div>
+
+          <div class="report-content">
+            <strong>
+              JSON Report
+            </strong>
+
+            <span>
+              {{
+                execution.report
+                  .json_report_name
+                  || 'Not generated'
+              }}
+            </span>
+          </div>
+
+          <a
+            *ngIf="
+              getJsonReportUrl()
+                as jsonUrl
+            "
+            [href]="jsonUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="report-button"
+          >
+            Open
+          </a>
+        </article>
+      </div>
+    </article>
+  </ng-container>
+</section>

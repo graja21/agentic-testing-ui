@@ -26,7 +26,24 @@ export const routes: Routes = [
       {
         path: 'reports',
         component: ReportsComponent
-      }
+      },
+      {
+  path: 'reports',
+  loadComponent: () =>
+    import(
+      './pages/reports/reports.component'
+    ).then(
+      (component) =>
+        component.ReportsComponent,
+    ),
+},
+
+{
+  path: 'reports/:id',
+  loadComponent: () =>
+    import('./pages/execution-details/execution-details.component')
+      .then(m => m.ExecutionDetailsComponent),
+},
     ]
   },
   {

@@ -1,127 +1,415 @@
-<section class="dashboard">
-  <header class="page-heading">
+<section class="dashboard-page">
+  <div class="page-header">
     <div>
-      <span class="eyebrow">
-        Overview
-      </span>
+      <p class="eyebrow">
+        AI QUALITY PLATFORM
+      </p>
 
-      <h2>Testing dashboard</h2>
+      <h1>Dashboard</h1>
 
-      <p>
-        Monitor your agentic chatbot testing platform.
+      <p class="subtitle">
+        Monitor chatbot testing performance
+        and recent pipeline executions.
       </p>
     </div>
 
-    <a
-      routerLink="/pipeline"
-      class="run-button"
-    >
-      <i class="bi bi-play-fill"></i>
-      Run pipeline
-    </a>
-  </header>
+    <div class="header-actions">
+      <button
+        type="button"
+        class="refresh-button"
+        [disabled]="loading"
+        (click)="loadDashboard()"
+      >
+        <i
+          class="bi bi-arrow-clockwise"
+          [class.spin]="loading"
+        ></i>
 
-  <div class="metrics">
-    <article>
-      <div class="metric-icon purple">
-        <i class="bi bi-diagram-3"></i>
+        Refresh
+      </button>
+
+      <a
+        routerLink="/pipeline-runner"
+        class="primary-button"
+      >
+        <i class="bi bi-play-fill"></i>
+
+        Run Pipeline
+      </a>
+    </div>
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="error-alert"
+  >
+    <i
+      class="bi bi-exclamation-triangle"
+    ></i>
+
+    <span>
+      {{ errorMessage }}
+    </span>
+  </div>
+
+  <div class="stats-grid">
+    <article class="stat-card">
+      <div class="stat-icon executions">
+        <i
+          class="bi bi-lightning-charge"
+        ></i>
       </div>
 
-      <span>Total executions</span>
-      <strong>0</strong>
-      <small>Waiting for your first run</small>
+      <div class="stat-content">
+        <span class="stat-label">
+          Total Executions
+        </span>
+
+        <strong class="stat-value">
+          {{ summary.total_executions }}
+        </strong>
+
+        <span class="stat-caption">
+          Stored in MongoDB
+        </span>
+      </div>
     </article>
 
-    <article>
-      <div class="metric-icon green">
-        <i class="bi bi-check-circle"></i>
+    <article class="stat-card">
+      <div class="stat-icon tests">
+        <i class="bi bi-list-check"></i>
       </div>
 
-      <span>Passed tests</span>
-      <strong>0</strong>
-      <small>No results available</small>
+      <div class="stat-content">
+        <span class="stat-label">
+          Total Tests
+        </span>
+
+        <strong class="stat-value">
+          {{ summary.total_tests }}
+        </strong>
+
+        <span class="stat-caption">
+          Executed test cases
+        </span>
+      </div>
     </article>
 
-    <article>
-      <div class="metric-icon red">
+    <article class="stat-card">
+      <div class="stat-icon passed">
+        <i
+          class="bi bi-check-circle"
+        ></i>
+      </div>
+
+      <div class="stat-content">
+        <span class="stat-label">
+          Passed Tests
+        </span>
+
+        <strong class="stat-value">
+          {{ summary.passed_tests }}
+        </strong>
+
+        <span class="stat-caption">
+          Successful evaluations
+        </span>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon failed">
         <i class="bi bi-x-circle"></i>
       </div>
 
-      <span>Failed tests</span>
-      <strong>0</strong>
-      <small>No results available</small>
+      <div class="stat-content">
+        <span class="stat-label">
+          Failed Tests
+        </span>
+
+        <strong class="stat-value">
+          {{ totalFailedTests }}
+        </strong>
+
+        <span class="stat-caption">
+          Failures and errors
+        </span>
+      </div>
     </article>
 
-    <article>
-      <div class="metric-icon orange">
-        <i class="bi bi-speedometer2"></i>
+    <article class="stat-card">
+      <div class="stat-icon rate">
+        <i
+          class="bi bi-graph-up-arrow"
+        ></i>
       </div>
 
-      <span>Pass rate</span>
-      <strong>0%</strong>
-      <small>Run a pipeline to calculate</small>
+      <div class="stat-content">
+        <span class="stat-label">
+          Average Pass Rate
+        </span>
+
+        <strong class="stat-value">
+          {{
+            summary.average_pass_rate
+              | number: '1.0-2'
+          }}%
+        </strong>
+
+        <span class="stat-caption">
+          Across all executions
+        </span>
+      </div>
     </article>
   </div>
 
   <div class="dashboard-grid">
-    <article class="panel agents-panel">
-      <header>
+    <article class="content-card pipeline-card">
+      <div class="card-header">
         <div>
-          <span class="eyebrow">Architecture</span>
-          <h3>Agent pipeline</h3>
+          <span class="card-kicker">
+            MULTI-AGENT PIPELINE
+          </span>
+
+          <h2>Testing workflow</h2>
         </div>
+      </div>
 
-        <span class="ready-badge">
-          Ready
-        </span>
-      </header>
+      <div class="pipeline-flow">
+        <div class="pipeline-step">
+          <span class="step-number">
+            01
+          </span>
 
-      <div class="agent-flow">
-        <div class="agent">
           <i class="bi bi-stars"></i>
+
           <strong>Generator</strong>
-          <span>Creates test cases</span>
+
+          <small>
+            Creates test cases
+          </small>
         </div>
 
-        <i class="bi bi-arrow-right flow-arrow"></i>
+        <i
+          class="bi bi-arrow-right flow-arrow"
+        ></i>
 
-        <div class="agent">
-          <i class="bi bi-play-circle"></i>
+        <div class="pipeline-step">
+          <span class="step-number">
+            02
+          </span>
+
+          <i
+            class="bi bi-play-circle"
+          ></i>
+
           <strong>Executor</strong>
-          <span>Runs API or Web tests</span>
+
+          <small>
+            Runs API or Web tests
+          </small>
         </div>
 
-        <i class="bi bi-arrow-right flow-arrow"></i>
+        <i
+          class="bi bi-arrow-right flow-arrow"
+        ></i>
 
-        <div class="agent">
+        <div class="pipeline-step">
+          <span class="step-number">
+            03
+          </span>
+
           <i class="bi bi-search"></i>
+
           <strong>Evaluator</strong>
-          <span>Scores responses</span>
+
+          <small>
+            Evaluates responses
+          </small>
         </div>
 
-        <i class="bi bi-arrow-right flow-arrow"></i>
+        <i
+          class="bi bi-arrow-right flow-arrow"
+        ></i>
 
-        <div class="agent">
-          <i class="bi bi-file-earmark-text"></i>
+        <div class="pipeline-step">
+          <span class="step-number">
+            04
+          </span>
+
+          <i
+            class="bi bi-file-earmark-text"
+          ></i>
+
           <strong>Reporter</strong>
-          <span>Builds reports</span>
+
+          <small>
+            Generates reports
+          </small>
         </div>
       </div>
     </article>
 
-    <article class="panel quick-panel">
-      <span class="eyebrow">Quick start</span>
-      <h3>Launch a new test</h3>
+    <article class="content-card recent-card">
+      <div class="card-header">
+        <div>
+          <span class="card-kicker">
+            MONGODB HISTORY
+          </span>
 
-      <p>
-        Describe your chatbot, select API or Web mode,
-        then execute the complete agentic pipeline.
-      </p>
+          <h2>Recent executions</h2>
+        </div>
 
-      <a routerLink="/pipeline">
-        Configure pipeline
-        <i class="bi bi-arrow-right"></i>
-      </a>
+        <a
+          routerLink="/reports"
+          class="text-link"
+        >
+          View all
+
+          <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <div
+        *ngIf="loading"
+        class="loading-state"
+      >
+        <div class="spinner"></div>
+
+        <span>
+          Loading executions...
+        </span>
+      </div>
+
+      <div
+        *ngIf="
+          !loading
+          && recentExecutions.length === 0
+        "
+        class="empty-state"
+      >
+        <i class="bi bi-database"></i>
+
+        <h3>No executions yet</h3>
+
+        <p>
+          Run your first pipeline to create
+          execution history.
+        </p>
+
+        <a
+          routerLink="/pipeline-runner"
+          class="primary-button"
+        >
+          Run Pipeline
+        </a>
+      </div>
+
+      <div
+        *ngIf="
+          !loading
+          && recentExecutions.length > 0
+        "
+        class="execution-list"
+      >
+        <article
+          *ngFor="
+            let execution of recentExecutions;
+            trackBy: trackExecution
+          "
+          class="execution-item"
+        >
+          <div
+            class="execution-mode"
+            [class.web]="
+              execution.execution_mode === 'web'
+            "
+            [class.api]="
+              execution.execution_mode === 'api'
+            "
+          >
+            <i
+              class="bi"
+              [ngClass]="
+                execution.execution_mode === 'web'
+                  ? 'bi-globe'
+                  : 'bi-code-slash'
+              "
+            ></i>
+          </div>
+
+          <div class="execution-main">
+            <div class="execution-title-row">
+              <strong>
+                {{
+                  execution.execution_mode
+                    | uppercase
+                }}
+                Pipeline
+              </strong>
+
+              <span
+                class="status-badge"
+                [ngClass]="
+                  getPassRateClass(
+                    execution.pass_rate
+                  )
+                "
+              >
+                {{
+                  execution.pass_rate
+                    | number: '1.0-2'
+                }}%
+              </span>
+            </div>
+
+            <p>
+              {{
+                execution.specification
+                  | slice: 0: 85
+              }}
+
+              <span
+                *ngIf="
+                  execution.specification.length
+                    > 85
+                "
+              >
+                ...
+              </span>
+            </p>
+
+            <div class="execution-meta">
+              <span>
+                <i
+                  class="bi bi-check-circle"
+                ></i>
+
+                {{ execution.passed }}
+                passed
+              </span>
+
+              <span>
+                <i
+                  class="bi bi-x-circle"
+                ></i>
+
+                {{ execution.failed }}
+                failed
+              </span>
+
+              <span>
+                <i class="bi bi-clock"></i>
+
+                {{
+                  execution.created_at
+                    | date: 'dd/MM/yyyy HH:mm'
+                }}
+              </span>
+            </div>
+          </div>
+        </article>
+      </div>
     </article>
   </div>
 </section>
